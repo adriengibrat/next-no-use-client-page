@@ -1,5 +1,5 @@
 const { RuleTester } = require("eslint");
-const rule = require("../../../lib/rules/no-client-on-page");
+const rule = require("../../../lib/rules/no-use-client-on-page");
 
 const ruleTester = new RuleTester({
     parser: require.resolve("@babel/eslint-parser"),
@@ -28,6 +28,21 @@ ruleTester.run("no-client-on-page", rule, {
         const Pages = () => { return <div>Hello, Pages!</div>; };
       `,
             filename: "./app/components/pages.tsx",
+        },
+        // Case of 'app' folder root
+        {
+            code: `
+        import React from 'react';
+        const Page = () => { return <div>Hello, Page!</div>; };
+      `,
+            filename: "./app/page.ts",
+        },
+        {
+            code: `
+        import React from 'react';
+        const Pages = () => { return <div>Hello, Pages!</div>; };
+      `,
+            filename: "./app/pages.tsx",
         },
         // File not inside 'app' folder
         {
@@ -74,6 +89,25 @@ ruleTester.run("no-client-on-page", rule, {
         const Pages = () => { return <div>Hello, Pages!</div>; };
       `,
             filename: "./app/components/pages.tsx",
+            errors: [{ messageId: "noUseClient" }],
+        },
+        // Case of 'app' folder root
+        {
+            code: `
+        "use client";
+        import React from 'react';
+        const Page = () => { return <div>Hello, Page!</div>; };
+      `,
+            filename: "./app/page.ts",
+            errors: [{ messageId: "noUseClient" }],
+        },
+        {
+            code: `
+        "use client";
+        import React from 'react';
+        const Pages = () => { return <div>Hello, Pages!</div>; };
+      `,
+            filename: "./app/pages.tsx",
             errors: [{ messageId: "noUseClient" }],
         },
         // 'use client' in a '.js' file inside 'app' folder
